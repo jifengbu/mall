@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Access-Control-Allow-Origin" content="*">
+	<meta http-equiv="content-security-policy">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>赢销截拳道电子商城</title>
+	<link rel="stylesheet" href="../../css/mui.min.css" />
+	<link rel="stylesheet" href="../../css/common.css" />
+</head>
+<style>
+	.mui-control-content {
+		    position: absolute;
+		    top: 85px;
+		    right: 0;
+		    bottom: 0;
+		    left: 0;
+		    width: 100%;
+		    height: auto;
+	}
+	.mui-segmented-control {
+		border: 1px solid #ccc;
+	}
+	.mui-segmented-control .mui-control-item {
+		color: #555555;
+	    border-color: #E29C43;
+	    border-left: 1px solid #E29C43;
+	}
+	.mui-segmented-control .mui-control-item.mui-active {
+		background: -webkit-linear-gradient(top, #F99032,#FFBA33);
+		background: -o-linear-gradient(top, #F99032,#FFBA33);
+		background: -moz-linear-gradient(top, #F99032,#FFBA33);
+		background: linear-gradient(top, #F99032,#FFBA33);
+	}
+	.mui-table-view-cell {
+		font-size: 14px;
+	}
+</style>
+<body>
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 id="title" class="mui-title">分销明细</h1>
+	</header>
+	<div class="mui-content">
+		<div>
+			<div id="segmentedControl" class="mui-segmented-control">
+				<a class="mui-control-item mui-active" href="#item1">
+					分销记录
+				</a>
+				<a class="mui-control-item" href="#item2">
+					提现记录
+				</a>
+			</div>
+		</div>
+		<div>
+			<div id="item1" class="mui-control-content mui-active">
+				<div id="scroll" class="mui-scroll-wrapper">
+					<div class="mui-scroll">
+						<ul class="mui-table-view">
+							<!--<li class="mui-table-view-cell">
+								<div><span class="font-gray">分润：</span><span class="font-red">￥18.00</span></div>
+								<div class="font-gray">时间：2016-01-07</div>
+							</li>-->
+							
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div id="item2" class="mui-control-content">
+				<div id="scroll" class="mui-scroll-wrapper">
+					<div class="mui-scroll">
+						<ul class="mui-table-view">
+							<!--<li class="mui-table-view-cell">
+								<div><span class="font-gray">提现：</span><span class="font-red">￥18.00</span></div>
+								<div class="font-gray">时间：2016-01-07</div>
+							</li>-->
+							
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="../../js/thirdparty/mui.min.js" ></script>
+<script src="../../js/thirdparty/zepto.1.1.6.min.js"></script>
+<script src="../../js/utils/app.js"></script>
+<script>
+	"use strict";
+	mui.init();
+	
+	mui('.mui-scroll-wrapper').scroll();
+	var params = app.router.getParameter();
+	var saved = app.router.getSavedData();
+	$(function(){
+		if (saved.item1) {
+			callbackItem1(saved.item1);
+		} else {
+			initItem1();
+		}
+		if (saved.item2) {
+			callbackItem2(saved.item2);
+		} else {
+			initItem2();
+		}
+	});
+	
+	function initItem1(){
+		var url = app.route.ROUTE_GET_THIRDPARTY_DETAIL_DATA;
+		var data = {openID: app.global.get("wechatInfo").openID};
+		app.utils.post({
+			url : url,
+			data: data,
+			success : callbackItem1,
+		});
+	}
+	function callbackItem1(data){
+		if (data.success === true && data.context) {
+			var profitInfo = data.context.profitInfo;
+			var li = '';
+			for(var i=0;i<profitInfo.length;i++){
+				li += htmlItem1(profitInfo[i]);
+			}
+			$("#item1 .mui-table-view").html(li);
+			saved.item1 = data;
+		}
+	}
+	function htmlItem1(list){
+		var li = '<li class="mui-table-view-cell">'+
+				 '		<div><span class="font-gray">分润：</span><span class="font-red">￥'+list.money+'</span></div>'+
+				 '		<div class="font-gray">时间：'+list.time+'</div>'+
+				 '	</li>';
+		return li;
+	}
+	function initItem2(){
+		var url = app.route.ROUTE_GET_THIRDPARTY_DETAILCASH_DATA;
+		var data = {openID: app.global.get("wechatInfo").openID};
+		app.utils.post({
+			url : url,
+			data: data,
+			success : callbackItem2,
+		});
+	}
+	function callbackItem2(data){
+		if (data.success === true && data.context) {
+			var profitInfo = data.context.profitInfo;
+			var li = '';
+			for(var i=0;i<profitInfo.length;i++){
+				li += htmlItem2(profitInfo[i]);
+			}
+			$("#item2 .mui-table-view").html(li);
+			saved.item2 = data;
+		}
+	}
+	function htmlItem2(list){
+		var li = '<li class="mui-table-view-cell">'+
+				 '		<div><span class="font-gray">提现：</span><span class="font-red">￥'+list.money+'</span></div>'+
+				 '		<div class="font-gray">时间：'+list.time+'</div>'+
+				 '	</li>';
+		return li;
+	}
+</script>
+</html>

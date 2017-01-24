@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="Access-Control-Allow-Origin" content="*">
+	<meta http-equiv="content-security-policy">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>赢销截拳道电子商城</title>
+	<link rel="stylesheet" href="../../css/mui.min.css" />
+	<link rel="stylesheet" href="../../css/common.css" />
+	<style>
+		.mui-table-view-cell {
+		    padding: 0;
+		    margin-bottom: 0px;
+		}
+		.mui-table-view-cell:before, .mui-table-view-cell:last-child:before, .mui-table-view-cell:first-child:before{
+		    position: absolute;
+		    right: 0;
+		    left: 0;
+		    content: '';
+		    height: 20px;
+		    top: 0px;
+		    background: linear-gradient(#8F8F8F, transparent);
+		}
+		.mui-table-view:after {
+			height: 0px;
+		}
+		.dis_image_container {
+			height: 100px;
+		}
+		.dis_image {
+			height: 100%;
+		}
+		.dis_code_container{
+			height: 250px;
+			width:100%;
+			text-align: center;
+		}
+		.dis_info_container {
+			margin: 30px 30px;
+			position: relative;
+		}
+		.about-title {
+			color:red;
+			font-size: 20px;
+			padding-left: 20px;
+		}
+		.about-title::before {
+			position: absolute;
+			left: 0;
+			margin-top: 3px;
+		    content: '';
+			height: 15px;
+			width: 15px;
+			background-color: red;
+		}
+		.about-content {
+			padding: 20px;
+		}
+		.company-info-container {
+			text-align: center;
+			color: gray;
+			margin-bottom: 40px;
+			width: 100%;
+		}
+		.company-copy {
+			font-size: 13px;
+		}
+		.company-name {
+			font-size: 12px;
+		}
+		.info-edit {
+			margin-top: 30px;
+			padding: 0 10px;
+		}
+	</style>
+</head>
+<body style="background-color: #fff;">
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 id="title" class="mui-title">成为商家</h1>
+	</header>
+	<div class="mui-content">
+		<ul class="mui-table-view" style="margin-top:0px;">
+			 <!--<li class="mui-table-view-cell">
+				 <div class="dis_image_container">
+					 <img class="dis_image" src="../../img/personal/brand.png">
+				 </div>
+			 </li>
+			 <li class="mui-table-view-cell">
+				 <div class="dis_code_container">
+					 <img id="barcode" class="dis_image" src="../../img/personal/qr_code.png">
+				 </div>
+
+			 </li>-->
+			 <li class="mui-table-view-cell">
+			 	<div class="info-edit">
+			 		<div class="font-black">欢迎加入<span class="font-red">赢销家俱乐部</span>，请填写申请信息！</div>
+					<input id="name" type="text" placeholder="请填写真实姓名" />
+					<input id="phone" type="number" placeholder="请填写手机号码方便联系" />
+					<button id="submitApply" type="button" class="mui-btn mui-btn-danger mui-btn-block">申请成为商家</button>
+			 	</div>
+			 </li>
+			 <li class="mui-table-view-cell">
+				 <div class="dis_info_container">
+					<div class="about-title">关于我们</div>
+					<p class="about-content">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;贵阳赢销截拳道网络科技有限公司是一个以提高国民赢销能力为己任的高科技公司、致力于用互联网的方式来传达赢销的思想到每个上进的人。精心打造在线赢销课程发布网站、app，练习场，提供在线训练互动的一站式全方位的赢销教育服务。
+					</p>
+ 					<div class=company-info-container>
+ 						<div class=company-copy>
+ 							黔ICP备15016439号-1
+ 						</div>
+ 						<div class=company-name>
+ 							版权所有©贵阳赢销截拳道网络科技有限公司
+ 						</div>
+ 					</div>
+				 </div>
+			 </li>
+		</ul>
+	</div>
+</body>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="../../js/thirdparty/mui.min.js" ></script>
+<script src="../../js/thirdparty/zepto.1.1.6.min.js"></script>
+<script src="../../js/utils/app.js"></script>
+<script src="../../js/utils/regular.js"></script>
+<script>
+	"use strict";
+
+	function getDisstributorBarcodeData(name,phone) {
+		var url = app.route.ROUTE_APPLY_MERCHANT;
+		var data = {
+			openID: app.global.get("wechatInfo").openID,
+			name:name,
+			phone:phone,
+		};
+		app.utils.post({
+			url : url,
+			data: data,
+			success : getDisstributorBarcodeDataSuccess,
+		});
+	}
+	function getDisstributorBarcodeDataSuccess(data) {
+		if (data.success === true) {
+			mui.toast("申请成功！");
+			window.location.href='../../index.html';
+		} else {
+			mui.toast(data.msg);
+		}
+	}
+	function showPage(data) {
+		$('#barcode').attr('src', data.distributorQR);
+	}
+
+	mui.init();
+
+	var params = app.router.getParameter();
+	var saved = app.router.getSavedData();
+	app.router.resetScollerBar();
+	$("#submitApply").on('tap', function() {
+		var name = $("#name").val();
+		var phone = $("#phone").val();
+		if (name == '') {
+			mui.toast("用户名不能为空！");
+			return;
+		}
+		if (!testPhone(phone)) {
+			mui.toast("手机号码格式不对！");
+			return;
+		}
+		getDisstributorBarcodeData(name,phone);
+	});
+//	if (saved.data) {
+//		showPage(saved.data);
+//	} else {
+//		getDisstributorBarcodeData();
+//	}
+</script>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Access-Control-Allow-Origin" content="*">
+	<meta http-equiv="content-security-policy">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>赢销截拳道电子商城</title>
+	<link rel="stylesheet" href="../../css/mui.min.css" />
+	<link rel="stylesheet" href="../../css/common.css" />
+</head>
+<style>
+	.total {
+		margin-top: 5px;
+		padding: 10px 20px;
+		background-color: #fff;
+	}
+	.left-num {
+		display: inline-block;
+		width: 88%;
+		vertical-align: middle;
+	}
+	.font-gray {
+		font-size: 16px;
+	}
+	#totalMoney {
+		font-size: 18px;
+	}
+	.font-red {
+		margin-top: 5px;
+		font-size: 16px;
+	}
+	.right-forward {
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.right-forward img {
+		width: 25px;
+		height: 25px;
+	}
+	.grade {
+		margin-top: 10px;
+	}
+	.grade .top,.bottom {
+		width: 33.33%;
+		display: inline-block;
+		vertical-align: middle;
+		padding: 10px 0;
+		text-align: center;
+		color: #fff;
+		font-size: 14px;
+	}
+	.top {
+		background: -webkit-linear-gradient(top,#F78C31,#FEB932);
+		background: -o-linear-gradient(top, #F78C31,#FEB932);
+		background: -moz-linear-gradient(top, #F78C31,#FEB932);
+		background: linear-gradient(top, #F78C31,#FEB932);
+	}
+	.bottom {
+		background: -webkit-linear-gradient(bottom,#F78C31,#FEB932);
+		background: -o-linear-gradient(top, #F78C31,#FEB932);
+		background: -moz-linear-gradient(top, #F78C31,#FEB932);
+		background: linear-gradient(top, #F78C31,#FEB932);
+	}
+	.fullbottom {
+		position: absolute;
+		top: 184px;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: 100%;
+	}
+	.fullbottom img {
+		width: 100%;
+		height: 100%;
+	}
+</style>
+<body>
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 id="title" class="mui-title">分销统计</h1>
+	</header>
+	<div class="mui-content">
+		<div class="total">
+			<div class="left-num">
+				<div class="font-gray">累计佣金</div>
+				<div id="totalMoney" class="li-price"><!--￥12345.34--></div>
+			</div><!--<div class="right-forward">
+				<img src="../../img/order/forward.png" /></div>-->
+		</div>
+		<div class="grade">
+			<div class="top">
+				<div>一级分润</div>
+				<div id="classAMoney"><!--￥321.43--></div>
+			</div><div class="bottom">
+				<div>二级分润</div>
+				<div id="classBMoney"><!--￥541.43--></div>
+			</div><div class="top">
+				<div>三级分润</div>
+				<div id="classCMoney"><!--￥651.43--></div>
+			</div>
+		</div>
+		<div class="fullbottom">
+			<img src="../../img/picture.png" />
+		</div>
+	</div>
+</body>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="../../js/thirdparty/mui.min.js" ></script>
+<script src="../../js/thirdparty/zepto.1.1.6.min.js"></script>
+<script src="../../js/utils/app.js"></script>
+<script>
+	"use strict";
+	mui.init();
+	
+	var params = app.router.getParameter();
+	$(function(){
+		var url = app.route.ROUTE_GET_THIRDPARTY_STATISTICS_DATA;
+		var data = {openID: app.global.get("wechatInfo").openID};
+		app.utils.post({
+			url : url,
+			data: data,
+			success : callback,
+		});
+	});
+	function callback(data){
+		if (data.success === true && data.context) {
+			$("#totalMoney").html("￥"+data.context.totalMoney.toFixed(2));
+			$("#classAMoney").html("￥"+data.context.classAMoney.toFixed(2));
+			$("#classBMoney").html("￥"+data.context.classBMoney.toFixed(2));
+			$("#classCMoney").html("￥"+data.context.classCMoney.toFixed(2));
+		}
+	}
+
+</script>
+</html>

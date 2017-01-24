@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>赢销截拳道电子商城</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link href="../../css/common.css" rel="stylesheet"/>
+</head>
+<body>
+	<style>
+		.choose-result {
+			width: 100%;
+			height: 100px;
+			background-color: #EEEEEE;
+		}
+		.choose-para {
+			height: 60px;
+			background-color: #EEEEEE;
+			border-bottom-style:solid;
+			border-bottom-width:1px;
+			border-color: gray;
+		}
+		.choose-para button{
+			height: 35px;
+			width: 80px;
+			margin-left: 10px;
+			border-radius: 5px;
+			background-color: #A2A2A2;
+		}
+		.choose-quantity {
+			height: 60px;
+			background-color: #EEEEEE;
+		}
+		.choose-goods {
+			position:fixed;
+			bottom: 0;
+			width: 100%;
+			height: 70%;
+			background-color: #EEEEEE;
+		}
+		.choose-result .img-back {
+			position: relative;
+			top: -30px;
+			left: 10px;
+			height: 120px;
+			width: 120px;
+			text-align: center;
+			float: left;
+			background-color: gainsboro;
+			border-radius: 10px;
+		}
+		.choose-result .choose-result-data {
+			position: relative;
+			left: 20px;
+			width: 200px;
+			height: 100px;
+			float: left;
+			/*background-color: red;*/
+		}
+		.choose-result img {
+			height: 100px;
+			width: 100px;
+			text-align: center;
+			margin-top: 10px;
+			border-radius: 10px;
+		}
+	</style>
+	<!--<div class="modal-backdrop"></div>-->
+	<div class="mui-content">
+		<div class="modal-backdrop">
+			<div class="choose-goods">
+			</div>
+		</div>
+	</div>
+	<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+	<script src="../../js/thirdparty/mui.min.js"></script>
+    <script src="../../js/thirdparty/zepto.1.1.6.min.js"></script>
+    <script src="../../js/utils/app.js"></script>
+    <script>
+	"use strict";
+
+		function getShoppingData() {
+			var url = app.route.ROUTE_GET_SHOPPING_DATA;
+			var data = {
+				openID: app.global.get("wechatInfo").openID,
+				goodsID:saved.goodsID,
+			};
+			app.utils.post({
+				url : url,
+				data: data,
+				success : getShoppingDataSuccess
+			});
+		};
+		function getShoppingDataSuccess(data) {
+			if (data.success === true && data.context) {
+				var context = data.context;
+				priceDic = context.price;
+				var html = '';
+				html = getChooseGoodsView(context);
+				$('.choose-goods').html(html);
+				$('#price').text(getChooseGoodsTotalPrice(priceDic));
+				attribute.push(getChooseGoodsTotalPrice(priceDic));
+				var hello = attribute.join('-');
+			}
+		};
+		function addShoppingCart() {
+			var url = app.route.ROUTE_ADD_SHOPPING_CART;
+			var data = {
+				openID: app.global.get("wechatInfo").openID,
+				goodsID:saved.goodsID,
+				attribute:attribute.join('-'),
+			};
+			app.utils.post({
+				url : url,
+				data: data,
+				success : addShoppingCartSuccess
+			});
+		};
+		function addShoppingCartSuccess(data) {
+			if (data.success === true) {
+				mui.toast("加入购物车成功");
+			}
+		};
+		var priceDic;
+		var attribute = new Array();
+		getShoppingData();
+		var chooseData = new Object();
+		function getChooseGoodsView(item) {
+			chooseData["price"] = 0;
+			chooseData["goodsID"] = item.goodsID;
+			chooseData["attr"] = new Array();
+			attribute[0] = item.goodsID;
+			var html = '';
+			html +=	'<div class="choose-result">'
+			html += 		'<div class="img-back">'
+			html += 			'<img src="../../img/goods-detail/muwu.jpg"></img>'
+			html += 		'</div>'
+			html += 		'<div class="choose-result-data">'
+			html += 			'<p id="price">¥：8979.00</p>'
+			html += 			'<p id="stock">库存：897</p>'
+			html += 			'<p id="option">请选择</p>'
+			html += 		'</div>'
+			html += 		'<span class=" mui-action-back mui-icon mui-icon-close" onclick="closeChooseGoodsView()"  style="float: right;"></span>'
+			html += 	'</div>'
+			html += 	'<div style="clear: both;"></div>'
+			for(var attrKey in item.code) {
+			html +=	'<div class="choose-para" id="'+attrKey+'">'
+			html +=		'<div>'+item.code[attrKey].primary+'</div>'
+						for(var secondKey in item.code[attrKey].secondary) {
+							if (secondKey===item.code[attrKey].default) {
+								html +=	'<button id="'+secondKey+'" style="background-color: darkorange;color: white">'+item.code[attrKey].secondary[secondKey]+'</button>'
+							} else {
+								html +=	'<button id="'+secondKey+'">'+item.code[attrKey].secondary[secondKey]+'</button>'
+							}
+
+						}
+				chooseData["attr"][attrKey]= item.code[attrKey].default;
+				attribute.push(item.code[attrKey].default);
+			html +=	'</div>'
+			}
+			html +=	'<div class="choose-quantity">'
+			html +=		'<h3 style="float: left;margin-top: 20px;">购买数量：</h3>'
+			html +=		'<div class="mui-numbox" data-numbox-step="1" data-numbox-min="1" style="float: right;margin-right: 5px;margin-top: 15px;">'
+			html +=			'<button class="mui-btn mui-btn-numbox-minus" type="button">-</button>'
+			html += 			'<input class="mui-input-numbox" type="number" value="1" />'
+			html +=			'<button class="mui-btn mui-btn-numbox-plus" type="button">+</button>'
+			html +=		'</div>'
+			html +=	'</div>'
+			html +=	'<button class="mui-btn mui-btn-block" style="background-color: red;position: fixed;bottom: 0;margin-bottom:0">确认</button>'
+			return html;
+		}
+
+		function getChooseGoodsTotalPrice(price) {
+			attribute.splice(1);
+			var arr = new Array();
+			for(var attKey in chooseData["attr"]) {
+				attribute.push(chooseData["attr"][attKey]);
+				arr.push(chooseData["attr"][attKey]);
+			}
+			var hh = chooseData["attr"][0];
+			if (arr.length===1) {
+				return price[arr[0]];
+			} else if (arr.length === 2) {
+				return price[arr[0]][arr[1]];
+			} else if (arr.length === 3) {
+				return price[arr[0]][arr[1]][arr[2]];
+			} else if (arr.length === 4) {
+				return price[arr[0]][arr[1]][arr[2]][arr[3]];
+			} else {
+				return 0;
+			}
+
+		}
+		function closeChooseGoodsView() {
+			$(".modal-backdrop").hide();
+			$(".choose-goods").hide();
+		}
+		//注册选择按钮事件
+		$('.mui-content').on('tap', '.choose-para button', function() {
+			$(this).siblings().css({"background-color":"#6a6761","color":"black"});
+			$(this).css({"background-color":"darkorange","color":"white"});
+			chooseData["attr"][this.parentNode.id]= this.id;
+			$('#price').text(getChooseGoodsTotalPrice(priceDic));
+		});
+	</script>
+</body>
+</html>
